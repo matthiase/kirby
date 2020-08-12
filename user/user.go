@@ -26,11 +26,11 @@ func (u *User) GenerateAccessToken() (string, error) {
 		Email: u.Email,
 		StandardClaims: jwt.StandardClaims{
 			Subject:   u.Email,
-			ExpiresAt: time.Now().Add(config.JWTAccessTokenTimeout()).Unix(),
+			ExpiresAt: time.Now().Add(config.Env.JwtAccessTokenTimeout).Unix(),
 		},
 	}
 
-	accessToken, err := jwtutil.Encode(claims)
+	accessToken, err := jwtutil.Encode(&claims)
 	if err != nil {
 		return "", err
 	}

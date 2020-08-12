@@ -14,7 +14,7 @@ import (
 // ServiceInterface declaration
 type ServiceInterface interface {
 	Find(uint) (*User, error)
-	Create(CreateUserRequest) (*User, error)
+	Create(*CreateUserRequest) (*User, error)
 	Authenticate(AuthenticationRequest) (*TokenPair, error)
 	RefreshAccessToken(RefreshTokenRequest) (string, error)
 }
@@ -38,7 +38,7 @@ func (s *Service) Find(id uint) (*User, error) {
 }
 
 // Create a new user record
-func (s *Service) Create(createUserRequest CreateUserRequest) (*User, error) {
+func (s *Service) Create(createUserRequest *CreateUserRequest) (*User, error) {
 	if err := createUserRequest.Validate(); err != nil {
 		return &User{}, errors.ValidationError{Message: err.Error()}
 	}
@@ -94,7 +94,7 @@ func (s *Service) Authenticate(authenticationRequest AuthenticationRequest) (*To
 		return &TokenPair{}, err
 	}
 
-	if err := s.Redis.Set(tokenPair.RefreshToken, json, config.JWTRefreshTokenTimeout()).Err(); err != nil {
+	if err := s.Redis.Set(tokenPair.RefreshToken, json, config.Env.JwtRefreshTokenTimeout).Err(); err != nil {
 		return &TokenPair{}, err
 	}
 	return tokenPair, nil

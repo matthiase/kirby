@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"kirby/errors"
 	"kirby/httputil"
 	"net/http"
 )
@@ -34,7 +35,12 @@ func Authenticate(userService ServiceInterface) func(http.ResponseWriter, *http.
 
 		tokenPair, err := userService.Authenticate(authenticationRequest)
 		if err != nil {
-			httputil.RespondWithError(w, http.StatusInternalServerError, err)
+			switch err.(type) {
+			case errors.AuthenticationError:
+				httputil.RespondWithError(w, http.StatusUnauthorized, err)
+			default:
+				httputil.RespondWithError(w, http.StatusInternalServerError, err)
+			}
 			return
 		}
 
@@ -42,7 +48,7 @@ func Authenticate(userService ServiceInterface) func(http.ResponseWriter, *http.
 			AccessToken:  tokenPair.AccessToken,
 			RefreshToken: tokenPair.RefreshToken,
 		}
-		httputil.RespondWithJSON(w, http.StatusCreated, authenticationResponse)
+		httputil.RespondWithJSON(w, http.StatusOK, authenticationResponse)
 	}
 
 	return handler

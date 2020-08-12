@@ -1,117 +1,90 @@
 package config
 
 import (
+	"log"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strconv"
 	"time"
 
 	"github.com/joho/godotenv"
 )
 
-func init() {
-	godotenv.Load()
+// Environment struct
+type environment struct {
+	Name                   string
+	Host                   string
+	Port                   uint
+	ServerTimeout          time.Duration
+	ReadTimeout            time.Duration
+	WriteTimeout           time.Duration
+	IdleTimeout            time.Duration
+	PostgresURI            string
+	RedisURI               string
+	RedisPassword          string
+	JwtSecret              string
+	JwtAccessTokenTimeout  time.Duration
+	JwtRefreshTokenTimeout time.Duration
 }
 
-// Host returns the hostname the application is running on
-func Host() string {
-	host := "127.0.0.1"
-	if env, ok := os.LookupEnv("HOST"); ok {
-		host = env
+// Env contains the globally accessible environment configuration
+var Env environment
+
+// LoadEnv loads project .env files
+func LoadEnv() {
+	environmentName := lookup("KIRBY_ENV", "development").(string)
+	_, caller, _, ok := runtime.Caller(0)
+	if !ok {
+		log.Fatalln("Failed to load environment configuration")
 	}
-	return host
+	basepath := filepath.Dir(caller) + "/../"
+
+	godotenv.Load(basepath + ".env." + environmentName + ".local")
+	if environmentName != "test" {
+		godotenv.Load(basepath + ".env.local")
+	}
+	godotenv.Load(basepath + ".env." + environmentName)
+	godotenv.Load(basepath + ".env")
+
+	Env = environment{
+		Name:                   environmentName,
+		Host:                   lookup("HOST", "localhost").(string),
+		Port:                   lookup("PORT", uint(8000)).(uint),
+		ServerTimeout:          lookup("TIMEOUT_SERVERx", 30*time.Second).(time.Duration),
+		ReadTimeout:            lookup("TIMEOUT_READ", 15*time.Second).(time.Duration),
+		WriteTimeout:           lookup("TIMEOUT_WRITE", 10*time.Second).(time.Duration),
+		IdleTimeout:            lookup("TIMEOUT_IDLE", 5*time.Second).(time.Duration),
+		PostgresURI:            lookup("POSTGRES_URI", "postgres://postgres:@127.0.0.1:5432/kirby_"+environmentName+"?sslmode=disable").(string),
+		RedisURI:               lookup("REDIS_URI", "redis://127.0.0.1:6379/0").(string),
+		RedisPassword:          lookup("REDIS_PASSWORD", "").(string),
+		JwtSecret:              lookup("JWT_SECRET", "kirby_jwt_secret").(string),
+		JwtAccessTokenTimeout:  lookup("JWT_ACCESS_TOKEN_TIMEOUT", 15*time.Minute).(time.Duration),
+		JwtRefreshTokenTimeout: lookup("JWT_REFRESH_TOKEN_TIMEOUT", 10*24*time.Hour).(time.Duration),
+	}
 }
 
-// Port returns the port the application is listening on
-func Port() uint64 {
-	var port uint64 = 8000
-	if env, ok := os.LookupEnv("PORT"); ok {
-		if value, err := strconv.ParseUint(env, 10, 64); err == nil {
-			port = value
+func lookup(key string, fallback interface{}) interface{} {
+	var value interface{}
+	if env, ok := os.LookupEnv(key); ok {
+		value = env
+	} else {
+		return fallback
+	}
+
+	switch fallback.(type) {
+	case string:
+		return value.(string)
+	case uint:
+		v, _ := strconv.ParseUint(value.(string), 10, 64)
+		return uint(v)
+	case time.Duration:
+		var duration time.Duration
+		if v, err := time.ParseDuration(value.(string)); err != nil {
+			duration = v
 		}
+		return duration
+	default:
+		return value
 	}
-	return port
-}
-
-// ServerTimeout returns the duration until a operation times out
-func ServerTimeout() time.Duration {
-	var duration time.Duration = 30 * time.Second
-	if env, ok := os.LookupEnv("TIMEOUT_SERVER"); ok {
-		if value, err := time.ParseDuration(env); err == nil {
-			duration = value
-		}
-	}
-	return duration
-}
-
-// ReadTimeout returns the duration until a read operation times out
-func ReadTimeout() time.Duration {
-	var duration time.Duration = 15 * time.Second
-	if env, ok := os.LookupEnv("TIMEOUT_READ"); ok {
-		if value, err := time.ParseDuration(env); err == nil {
-			duration = value
-		}
-	}
-	return duration
-}
-
-// WriteTimeout returns the duration until a write operation times out
-func WriteTimeout() time.Duration {
-	var duration time.Duration = 10 * time.Second
-	if env, ok := os.LookupEnv("TIMEOUT_WRITE"); ok {
-		if value, err := time.ParseDuration(env); err == nil {
-			duration = value
-		}
-	}
-	return duration
-}
-
-// IdleTimeout returns the duration until and idle operation times out
-func IdleTimeout() time.Duration {
-	var duration time.Duration = 5 * time.Second
-	if env, ok := os.LookupEnv("TIMEOUT_IDLE"); ok {
-		if value, err := time.ParseDuration(env); err == nil {
-			duration = value
-		}
-	}
-	return duration
-}
-
-// DatabaseURI returns the database URI as a string
-func DatabaseURI() string {
-	var uri string = ""
-	if env, ok := os.LookupEnv("DATABASE_URI"); ok {
-		uri = env
-	}
-	return uri
-}
-
-// JWTSecret used to sign tokens
-func JWTSecret() string {
-	var secret = ""
-	if env, ok := os.LookupEnv("JWT_SECRET"); ok {
-		secret = env
-	}
-	return secret
-}
-
-// JWTAccessTokenTimeout determines the amount of time before access tokens expire
-func JWTAccessTokenTimeout() time.Duration {
-	var duration time.Duration = 15 * time.Minute
-	if env, ok := os.LookupEnv("JWT_ACCESS_TOKEN_TIMEOUT"); ok {
-		if value, err := time.ParseDuration(env); err == nil {
-			duration = value
-		}
-	}
-	return duration
-}
-
-// JWTRefreshTokenTimeout determines the amount of time before access tokens expire
-func JWTRefreshTokenTimeout() time.Duration {
-	var duration time.Duration = 10 * 24 * time.Hour
-	if env, ok := os.LookupEnv("JWT_REFRESH_TOKEN_TIMEOUT"); ok {
-		if value, err := time.ParseDuration(env); err == nil {
-			duration = value
-		}
-	}
-	return duration
 }

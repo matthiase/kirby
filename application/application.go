@@ -25,21 +25,24 @@ type Application struct {
 
 // NewApplication returns a fully initialized application struct
 func NewApplication() *Application {
-	dbClient, err := dbclient.Connect(config.DatabaseURI())
-	if err != nil {
-		log.Fatalln("Database connection failed")
-	}
+	config.LoadEnv()
+	router := chi.NewRouter()
+	application := &Application{router}
 
-	redisClient, err := redisclient.Connect("localhost:6379", "", 0)
+	dbClient, err := dbclient.Connect(config.Env.PostgresURI)
 	if err != nil {
-		log.Fatalln("Redis connection failed")
+		log.Fatalf("Database connection failed: %v\n", err)
 	}
 
 	dbClient.AutoMigrate(&user.User{})
 
+	redisClient, err := redisclient.Connect(config.Env.RedisURI, config.Env.RedisPassword)
+	if err != nil {
+		log.Fatalf("Redis connection failed: %v\n", err)
+	}
+
 	userService := &user.Service{DB: dbClient, Redis: redisClient}
 
-	router := chi.NewRouter()
 	router.Use(
 		middleware.RequestID,
 		middleware.RealIP,
@@ -63,7 +66,6 @@ func NewApplication() *Application {
 		r.Put("/", user.RefreshToken(userService))
 	})
 
-	application := &Application{router}
 	return application
 }
 
@@ -73,21 +75,21 @@ func (app *Application) Start() {
 	var runChannel = make(chan os.Signal, 1)
 	ctx, cancel := context.WithTimeout(
 		context.Background(),
-		config.ServerTimeout(),
+		config.Env.ServerTimeout,
 	)
 	defer cancel()
 
 	server := &http.Server{
-		Addr:         fmt.Sprintf("%s:%d", config.Host(), config.Port()),
+		Addr:         fmt.Sprintf("%s:%d", config.Env.Host, config.Env.Port),
 		Handler:      app.Router,
-		ReadTimeout:  config.ReadTimeout(),
-		WriteTimeout: config.WriteTimeout(),
-		IdleTimeout:  config.IdleTimeout(),
+		ReadTimeout:  config.Env.ReadTimeout,
+		WriteTimeout: config.Env.WriteTimeout,
+		IdleTimeout:  config.Env.IdleTimeout,
 	}
 
 	signal.Notify(runChannel, os.Interrupt, syscall.SIGTSTP)
 
-	log.Printf("Server is starting on %s\n", server.Addr)
+	log.Printf("Server is starting on %s (%s environment)\n", server.Addr, config.Env.Name)
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil {

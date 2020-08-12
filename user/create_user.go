@@ -34,7 +34,7 @@ func CreateUser(userService ServiceInterface) func(http.ResponseWriter, *http.Re
 			return
 		}
 
-		user, err := userService.Create(createUserRequest)
+		user, err := userService.Create(&createUserRequest)
 		if err != nil {
 			switch err.(type) {
 			case errors.ValidationError:
