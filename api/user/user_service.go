@@ -3,9 +3,10 @@ package user
 import (
 	"encoding/json"
 	"kirby/config"
-	"kirby/dbclient"
+	"kirby/database"
 	"kirby/errors"
-	"kirby/redisclient"
+
+	"github.com/go-redis/redis"
 
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
@@ -21,8 +22,8 @@ type ServiceInterface interface {
 
 // Service struct
 type Service struct {
-	DB    *dbclient.Connection
-	Redis *redisclient.Connection
+	DB    *gorm.DB
+	Redis *redis.Client
 }
 
 // Find a user by id
@@ -55,7 +56,7 @@ func (s *Service) Create(createUserRequest *CreateUserRequest) (*User, error) {
 	}
 
 	if err := s.DB.Create(&user).Error; err != nil {
-		if dbclient.IsUniqueConstraintError(err, dbclient.UniqueConstraintUserEmail) {
+		if database.IsUniqueConstraintError(err, database.UniqueConstraintUserEmail) {
 			return &User{}, errors.ValidationError{Message: "A user with that email address already exists"}
 		}
 		return &User{}, err

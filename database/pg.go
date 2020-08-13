@@ -1,28 +1,31 @@
-package dbclient
+package database
 
 import (
+	"kirby/config"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // use postgres dialect
 	"github.com/lib/pq"
 )
 
-// Connection wraps the underlying database connection
-type Connection struct {
-	*gorm.DB
-}
+var (
+	// Pg represents a database connection
+	Pg *gorm.DB
+)
 
 const (
 	// UniqueConstraintUserEmail enforces unique user emails
 	UniqueConstraintUserEmail = "uix_users_email"
 )
 
-// Connect opens a connection to the database
-func Connect(dataSourceName string) (*Connection, error) {
-	db, err := gorm.Open("postgres", dataSourceName)
+// PgConnect opens a connection to the database
+func PgConnect() (*gorm.DB, error) {
+	db, err := gorm.Open("postgres", config.Env.PostgresURI)
 	if err != nil {
 		return nil, err
 	}
-	return &Connection{db}, nil
+	Pg = db
+	return Pg, nil
 }
 
 // IsUniqueConstraintError determines whether an error originating from the database is

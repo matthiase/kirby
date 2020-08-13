@@ -1,13 +1,12 @@
-package application
+package api
 
 import (
 	"context"
 	"fmt"
+	"kirby/api/healthcheck"
+	"kirby/api/user"
 	"kirby/config"
-	"kirby/dbclient"
-	"kirby/healthcheck"
-	"kirby/redisclient"
-	"kirby/user"
+	"kirby/database"
 	"log"
 	"net/http"
 	"os"
@@ -18,30 +17,28 @@ import (
 	"github.com/go-chi/chi/middleware"
 )
 
-// Application struct
-type Application struct {
+// Server struct
+type Server struct {
 	Router *chi.Mux
 }
 
-// NewApplication returns a fully initialized application struct
-func NewApplication() *Application {
+// NewServer returns a fully initialized application struct
+func NewServer() *Server {
 	config.LoadEnv()
 	router := chi.NewRouter()
-	application := &Application{router}
+	application := &Server{router}
 
-	dbClient, err := dbclient.Connect(config.Env.PostgresURI)
+	pg, err := database.PgConnect()
 	if err != nil {
-		log.Fatalf("Database connection failed: %v\n", err)
+		log.Fatalf("Postgres connection failed: %v\n", err)
 	}
+	pg.AutoMigrate(&user.User{})
 
-	dbClient.AutoMigrate(&user.User{})
-
-	redisClient, err := redisclient.Connect(config.Env.RedisURI, config.Env.RedisPassword)
+	redis, err := database.RedisConnect()
 	if err != nil {
 		log.Fatalf("Redis connection failed: %v\n", err)
 	}
-
-	userService := &user.Service{DB: dbClient, Redis: redisClient}
+	userService := &user.Service{DB: pg, Redis: redis}
 
 	router.Use(
 		middleware.RequestID,
@@ -53,7 +50,7 @@ func NewApplication() *Application {
 
 	router.Route("/health", func(r chi.Router) {
 		r.Get("/server", healthcheck.CheckHTTPConnection)
-		r.Get("/database", healthcheck.CheckDatabaseConnection(dbClient))
+		r.Get("/database", healthcheck.CheckDatabaseConnection(database.Pg))
 	})
 
 	router.Route("/users", func(r chi.Router) {
@@ -70,7 +67,7 @@ func NewApplication() *Application {
 }
 
 // Start running the application
-func (app *Application) Start() {
+func (app *Server) Start() {
 
 	var runChannel = make(chan os.Signal, 1)
 	ctx, cancel := context.WithTimeout(

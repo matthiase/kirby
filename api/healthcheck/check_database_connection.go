@@ -2,13 +2,14 @@ package healthcheck
 
 import (
 	"fmt"
-	"kirby/dbclient"
 	"kirby/httputil"
 	"net/http"
+
+	"github.com/jinzhu/gorm"
 )
 
 // CheckDatabaseConnection verifies successful database connection
-func CheckDatabaseConnection(db *dbclient.Connection) func(http.ResponseWriter, *http.Request) {
+func CheckDatabaseConnection(db *gorm.DB) func(http.ResponseWriter, *http.Request) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		var result DatabaseCheckResult
 		db.Raw("SELECT current_database()").Scan(&result)

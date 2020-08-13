@@ -80,7 +80,7 @@ func lookup(key string, fallback interface{}) interface{} {
 		return uint(v)
 	case time.Duration:
 		var duration time.Duration
-		if v, err := time.ParseDuration(value.(string)); err != nil {
+		if v, err := time.ParseDuration(value.(string)); err == nil {
 			duration = v
 		}
 		return duration

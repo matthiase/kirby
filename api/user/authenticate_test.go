@@ -3,11 +3,9 @@ package user
 import (
 	"bytes"
 	"encoding/json"
-	"kirby/config"
-	"kirby/dbclient"
+	"kirby/database"
 	"kirby/httputil"
 	"kirby/jwtutil"
-	"kirby/redisclient"
 	"kirby/testutil"
 	"log"
 	"net/http"
@@ -33,23 +31,23 @@ func TestAuthenticate(t *testing.T) {
 		{"Valid credentials", `{"email": "valid@example.com", "password": "secretpwd"}`, http.StatusOK},
 	}
 
-	dbClient, err := dbclient.Connect(config.Env.PostgresURI)
+	pg, err := database.PgConnect()
 	if err != nil {
-		log.Fatalf("Database connection failed: %v\n", err)
+		log.Fatalf("Postgres connection failed: %v\n", err)
 	}
 
-	dbClient.AutoMigrate(&User{})
+	pg.AutoMigrate(&User{})
 
-	redisClient, err := redisclient.Connect(config.Env.RedisURI, config.Env.RedisPassword)
+	redis, err := database.RedisConnect()
 	if err != nil {
 		log.Fatalf("Redis connection failed: %v\n", err)
 	}
 
-	userService := &Service{DB: dbClient, Redis: redisClient}
+	userService := &Service{DB: pg, Redis: redis}
 	handler := http.HandlerFunc(Authenticate(userService))
 
 	setup := func() error {
-		dbClient.Exec("TRUNCATE TABLE users")
+		pg.Exec("TRUNCATE TABLE users")
 		_, err := userService.Create(&validUser)
 		return err
 	}
