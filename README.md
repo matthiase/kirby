@@ -1,12 +1,18 @@
 Kirby
 ===
 ## Development Environment Setup
-Start by installing Go and PostgreSQL on your system if they are not already available:
+Start by installing Go, PostgreSQL, and Redis on your system if they are not already available:
 ```
-brew update && brew install go postgresql
+brew update && brew install go postgresql redis
 ```
 
-Make sure the database server is running and create the development and test databases:
+Make sure the Postgres and Redis servers are running:
+```
+pg_ctl -D /usr/local/var/postgres start
+redis-server /usr/local/etc/redis.conf
+```
+
+Create the development and test databases:
 ```
 createdb kirby_development
 createdb kirby_test
