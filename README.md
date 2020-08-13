@@ -37,11 +37,20 @@ go run kirby.go
 At this point, you should be able to start issuing requests to the server:
 ```
 curl --request GET --url http://localhost:5000/health/server
-{"success":true,"data":{"status":"ok","message":"Server is accepting connections"}}
+{
+  "success": true,
+  "data": { "status": "ok", "message": "Server is accepting connections" }
+}
 ```
 ```
 curl --request GET --url http://localhost:5000/health/database
-{"success":true,"data":{"status":"ok","message":"Database connection to 'kirby_development' succeeded"}}
+{
+  "success": true,
+  "data": {
+    "status": "ok",
+    "message": "Database connection to 'kirby_development' succeeded"
+  }
+}
 ```
 ```
 curl --request POST \
@@ -52,7 +61,26 @@ curl --request POST \
         "email": "user@example.com",
         "password": "topsecret"
 }'
-{"success":true,"data":{"accessToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwibmFtZSI6IkV4YW1wbGUgVXNlciIsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSIsImV4cCI6MTU5NzM0NDU1NSwic3ViIjoidXNlckBleGFtcGxlLmNvbSJ9.XF8MXO6qZj2PqByg0a-MSI8O52BkEYgdl-NVX6_ajQc","refreshToken":"R4nBhewzhAV63sCkS2nIveLZ"}}
+{
+  "success": true,
+  "data": {
+    "accessToken": "eyJhbGciOi...jJIUzI1NQc",
+    "refreshToken": "R4nBhewzh...sCkS2nIveZ"
+  }
+}
+```
+```
+curl --request GET \
+  --url http://localhost:5000/users/1 \
+  --header 'authorization: Bearer eyJhbGciOi...jJIUzI1NQc' \
+  --header 'content-type: application/json'
+{
+  "success": true,
+  "data": {
+    "name": "Example User",
+    "email": "user@example.com"
+  }
+}
 ```
 
 Remember that your host and port may vary if you're not using the default environment configuration.
