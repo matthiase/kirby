@@ -1,6 +1,6 @@
 Kirby
 ===
-## Development Environment Setup
+### Development Environment Setup
 Start by installing Go, PostgreSQL, and Redis on your system if they are not already available:
 ```
 brew update && brew install go postgresql redis
