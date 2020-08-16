@@ -1,0 +1,12 @@
+@import 'variables';
+@import '~bulma';
+@import '~buefy/src/scss/buefy';
+@import 'spacing';
+
+.font-sm {
+  font-size: 0.9em;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+}

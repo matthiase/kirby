@@ -8,30 +8,18 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    name: 'About',
-    component: () => import(/* webpackChunkName: "about" */ '@/views/About')
-  },
-  {
-    path: '/',
-    name: 'Public',
     component: PublicLayout,
     children: [
       {
-        path: 'login',
-        name: 'LogIn',
-        component: () => import(/* webpackChunkName: "signin" */ '@/views/Login')
-      },
-      {
-        path: 'register',
-        name: 'Register',
-        component: () => import(/* webpackChunkName: "registration" */ '@/views/Registration')
+        path: '',
+        name: 'About',
+        component: () => import(/* webpackChunkName: "about" */ '@/views/About')
       }
     ]
   },
-
   {
     path: '/',
-    name: 'ApplicationLayout',
+    name: 'Application',
     component: ApplicationLayout,
     children: [
       {
@@ -41,6 +29,17 @@ const routes = [
       }
     ]
   },
+  {
+    path: '/login',
+    name: 'LogIn',
+    component: () => import(/* webpackChunkName: "signin" */ '@/views/Login')
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: () => import(/* webpackChunkName: "registration" */ '@/views/Registration')
+  },
+
   {
     path: '*',
     component: () => import(/* webpackChunkName: "notfound" */ '@/views/NotFound')
