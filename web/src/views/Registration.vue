@@ -32,7 +32,10 @@
                   <b-field label="Password">
                     <b-input type="password" autocomplete="new-password" password-reveal />
                   </b-field>
-                  <div class="mt-6">
+                  <div class="py-5 has-text-centered has-text-grey">
+                    By clicking the "Register" I agree to the terms of service
+                  </div>
+                  <div class="mt-3 mb-5">
                     <b-button type="is-info" expanded>
                       Register
                     </b-button>

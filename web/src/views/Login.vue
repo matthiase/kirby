@@ -41,9 +41,9 @@
                   <div class="has-text-centered py-5">
                     <b-checkbox size="is-small">Remember this device</b-checkbox>
                   </div>
-                  <div>
-                    <b-button type="is-info" expanded class="my-3">
-                      Sign In
+                  <div class="mt-3 mb-5">
+                    <b-button type="is-info" expanded>
+                      Sign in
                     </b-button>
                   </div>
                 </form>
