@@ -28,14 +28,6 @@ $custom-colors: (
     $orange-600,
     findColorInvert($orange-600)
   ),
-  'error-light': (
-    $red-100,
-    $red-700
-  ),
-  'success-light': (
-    $green-100,
-    $green-700
-  )
 );
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');

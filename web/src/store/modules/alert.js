@@ -23,7 +23,7 @@ const Alert = {
       state.message = message
     },
     setError(state, message) {
-      state.type = 'error'
+      state.type = 'danger'
       state.message = message
     },
     clearError(state) {

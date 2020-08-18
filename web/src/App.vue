@@ -2,7 +2,7 @@
   <div id="app">
     <div v-if="alert.message">
       <b-notification
-        :type="`is-${alert.type}-light`"
+        :type="`is-${alert.type} is-light`"
         @close="handleNotificationClosed"
         aria-close-label="Close notification"
         role="alert"
