@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import './plugins/axios'
 import Buefy from 'buefy'
 import '@mdi/font/css/materialdesignicons.css'
 

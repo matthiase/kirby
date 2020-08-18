@@ -6,15 +6,19 @@ $indigo-700: rgb(81, 69, 205);
 $indigo-600: rgb(88, 80, 236);
 $indigo-500: rgb(104, 117, 245);
 $teal-500: rgb(6, 148, 162);
-$orange-600: rgb(252, 56, 56);
+$orange-600: rgb(208, 56, 1);
+$red-700: rgb(200, 30, 30);
+$red-100: rgb(253, 232, 232);
+$green-700: rgb(4, 108, 78);
+$green-100: rgb(222, 247, 236);
 
 $primary: $indigo-500;
 $info: $teal-500;
 $link: $indigo-700;
+$success: $green-700;
+$danger: $red-700;
 /*
-$success: #5bb75b;
 $warning: #faa732;
-$danger: #da4f49;
 $dark: #363636;
 $text: $grey-darker;
 */
@@ -23,17 +27,25 @@ $custom-colors: (
   'accent': (
     $orange-600,
     findColorInvert($orange-600)
+  ),
+  'error-light': (
+    $red-100,
+    $red-700
+  ),
+  'success-light': (
+    $green-100,
+    $green-700
   )
 );
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 $family-sans-serif: 'Inter', sans-serif;
+
 $label-weight: 400;
 $link-hover: $indigo-500;
-@import '~bulma/sass/utilities/derived-variables';
+$notification-radius: 1px;
 
-// Derived variables
-// $text: $grey-medium;
+@import '~bulma/sass/utilities/derived-variables';
 
 // Colors
 $colors: map-merge($colors, $custom-colors);

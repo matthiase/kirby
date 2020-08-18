@@ -22,21 +22,21 @@
                     </router-link>
                   </p>
                 </div>
-                <form action="#" method="POST" class="pt-5">
+                <form @submit.prevent='handleSubmit' class="pt-5">
                   <b-field label="Full name">
-                    <b-input type="text" />
+                    <b-input type="text" v-model="user.name" />
                   </b-field>
                   <b-field label="Email address">
-                    <b-input type="email" />
+                    <b-input type="email" v-model="user.email" />
                   </b-field>
                   <b-field label="Password">
-                    <b-input type="password" autocomplete="new-password" password-reveal />
+                    <b-input type="password" v-model="user.password" autocomplete="new-password" password-reveal />
                   </b-field>
                   <div class="py-5 has-text-centered has-text-grey">
                     By clicking the "Register" I agree to the terms of service
                   </div>
                   <div class="mt-3 mb-5">
-                    <b-button type="is-info" expanded>
+                    <b-button type="is-info" native-type="submit" expanded>
                       Register
                     </b-button>
                   </div>
@@ -106,7 +106,27 @@
 </template>
 
 <script>
+import { mapState, mapActions} from 'vuex'
+
 export default {
-  name: 'RegistrationView'
+  name: 'RegistrationView',
+  data() {
+    return {
+      user: {
+        name: '',
+        email: '',
+        password: ''
+      }
+    }
+  },
+  computed: {
+    ...mapState('authentication', ['Authentication'])
+  },
+  methods: {
+    ...mapActions('authentication', ['register']),
+    async handleSubmit() {
+      await this.register(this.user)
+    }
+  }
 }
 </script>
