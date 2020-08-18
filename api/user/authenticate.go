@@ -35,12 +35,14 @@ func Authenticate(userService ServiceInterface) func(http.ResponseWriter, *http.
 
 		tokenPair, err := userService.Authenticate(authenticationRequest)
 		if err != nil {
+			var status uint32
 			switch err.(type) {
-			case errors.AuthenticationError:
-				httputil.RespondWithError(w, http.StatusUnauthorized, err)
+			case errors.ApplicationError:
+				status = err.(errors.ApplicationError).Status
 			default:
-				httputil.RespondWithError(w, http.StatusInternalServerError, err)
+				status = http.StatusInternalServerError
 			}
+			httputil.RespondWithError(w, status, err)
 			return
 		}
 

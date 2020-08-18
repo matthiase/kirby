@@ -37,8 +37,9 @@ func CreateUser(userService ServiceInterface) func(http.ResponseWriter, *http.Re
 		user, err := userService.Create(&createUserRequest)
 		if err != nil {
 			switch err.(type) {
-			case errors.ValidationError:
-				httputil.RespondWithError(w, http.StatusBadRequest, err)
+			case errors.ApplicationError:
+				httpStatusCode := err.(errors.ApplicationError).Status
+				httputil.RespondWithError(w, httpStatusCode, err)
 			default:
 				httputil.RespondWithError(w, http.StatusInternalServerError, err)
 			}

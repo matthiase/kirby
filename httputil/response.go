@@ -2,6 +2,7 @@ package httputil
 
 import (
 	"encoding/json"
+	"kirby/errors"
 	"net/http"
 )
 
@@ -13,14 +14,7 @@ type SuccessResponse struct {
 
 // ErrorResponse envelope
 type ErrorResponse struct {
-	Success bool      `json:"success" example:"false"`
-	Error   HTTPError `json:"error,omitempty"`
-}
-
-// HTTPError struct
-type HTTPError struct {
-	Code    uint32 `json:"code" example:"40001"`
-	Message string `json:"message" example:"status bad request"`
+	Errors []errors.ApplicationError `json:"errors,omitempty"`
 }
 
 // RespondWithStatus responds with status code
@@ -47,14 +41,9 @@ func RespondWithJSON(w http.ResponseWriter, httpStatus int, data interface{}) {
 
 // RespondWithError responds with error status code and serialized JSON error message
 func RespondWithError(w http.ResponseWriter, httpStatus uint32, err error) {
-	resp := ErrorResponse{
-		Success: false,
-		Error: HTTPError{
-			Code:    httpStatus,
-			Message: err.Error(),
-		},
-	}
-	json, err := json.Marshal(resp)
+	errors := []errors.ApplicationError{errors.ApplicationError{Message: err.Error()}}
+	resp := ErrorResponse{errors}
+	json, _ := json.Marshal(resp)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(int(httpStatus))
 	w.Write(json)

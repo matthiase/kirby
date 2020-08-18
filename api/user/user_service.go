@@ -5,6 +5,7 @@ import (
 	"kirby/config"
 	"kirby/database"
 	"kirby/errors"
+	"net/http"
 
 	"github.com/go-redis/redis"
 
@@ -31,7 +32,10 @@ func (s *Service) Find(id uint) (*User, error) {
 	user := User{}
 	if err := s.DB.Where("id = ?", id).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return &User{}, errors.NotFoundError{}
+			return &User{}, errors.ApplicationError{
+				Status:  http.StatusNotFound,
+				Message: "User not found",
+			}
 		}
 		return &user, err
 	}
@@ -41,7 +45,10 @@ func (s *Service) Find(id uint) (*User, error) {
 // Create a new user record
 func (s *Service) Create(createUserRequest *CreateUserRequest) (*User, error) {
 	if err := createUserRequest.Validate(); err != nil {
-		return &User{}, errors.ValidationError{Message: err.Error()}
+		return &User{}, errors.ApplicationError{
+			Status:  http.StatusBadRequest,
+			Message: "User request validation failed",
+		}
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(createUserRequest.Password), bcrypt.DefaultCost)
@@ -57,7 +64,11 @@ func (s *Service) Create(createUserRequest *CreateUserRequest) (*User, error) {
 
 	if err := s.DB.Create(&user).Error; err != nil {
 		if database.IsUniqueConstraintError(err, database.UniqueConstraintUserEmail) {
-			return &User{}, errors.ValidationError{Message: "A user with that email address already exists"}
+			return &User{}, errors.ApplicationError{
+				Status:  http.StatusBadRequest,
+				Source:  "user/email",
+				Message: "A user with that email address already exists",
+			}
 		}
 		return &User{}, err
 	}
@@ -67,20 +78,29 @@ func (s *Service) Create(createUserRequest *CreateUserRequest) (*User, error) {
 // Authenticate a user using their credentials and return a JWT token pair
 func (s *Service) Authenticate(authenticationRequest AuthenticationRequest) (*TokenPair, error) {
 	if err := authenticationRequest.Validate(); err != nil {
-		return &TokenPair{}, errors.ValidationError{Message: err.Error()}
+		return &TokenPair{}, errors.ApplicationError{
+			Status:  http.StatusBadRequest,
+			Message: "Authentication request validation failed",
+		}
 	}
 
 	user := User{}
 	if err := s.DB.Where("email = ?", authenticationRequest.Email).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return &TokenPair{}, errors.AuthenticationError{Message: "Invalid email address or password"}
+			return &TokenPair{}, errors.ApplicationError{
+				Status:  http.StatusUnauthorized,
+				Message: "Invalid email address or password",
+			}
 		}
 		return &TokenPair{}, err
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(authenticationRequest.Password)); err != nil {
 		if err == bcrypt.ErrMismatchedHashAndPassword {
-			return &TokenPair{}, errors.AuthenticationError{Message: "Invalid email address or password"}
+			return &TokenPair{}, errors.ApplicationError{
+				Status:  http.StatusUnauthorized,
+				Message: "Invalid email address or password",
+			}
 		}
 		return &TokenPair{}, err
 	}
@@ -104,17 +124,26 @@ func (s *Service) Authenticate(authenticationRequest AuthenticationRequest) (*To
 // RefreshAccessToken generate a new access token
 func (s *Service) RefreshAccessToken(refreshTokenRequest RefreshTokenRequest) (string, error) {
 	if err := refreshTokenRequest.Validate(); err != nil {
-		return "", errors.ValidationError{Message: err.Error()}
+		return "", errors.ApplicationError{
+			Status:  http.StatusBadRequest,
+			Message: "Refresh token request validation failed",
+		}
 	}
 
 	payload, err := s.Redis.Get(refreshTokenRequest.RefreshToken).Result()
 	if err != nil {
-		return "", errors.AuthenticationError{Message: "Invalid or expired refresh token"}
+		return "", errors.ApplicationError{
+			Status:  http.StatusUnauthorized,
+			Message: "Invalid or expired refresh token",
+		}
 	}
 
 	user := User{}
 	if err := json.Unmarshal([]byte(payload), &user); err != nil {
-		return "", errors.AuthenticationError{Message: "Invalid refresh token payload"}
+		return "", errors.ApplicationError{
+			Status:  http.StatusUnauthorized,
+			Message: "Invalid or expired refresh token",
+		}
 	}
 
 	accessToken, err := user.GenerateAccessToken()

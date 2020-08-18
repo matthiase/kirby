@@ -34,10 +34,8 @@ func RefreshToken(userService ServiceInterface) func(http.ResponseWriter, *http.
 		if err != nil {
 			var status uint32
 			switch err.(type) {
-			case errors.ValidationError:
-				status = http.StatusBadRequest
-			case errors.AuthenticationError:
-				status = http.StatusUnauthorized
+			case errors.ApplicationError:
+				status = err.(errors.ApplicationError).Status
 			default:
 				status = http.StatusInternalServerError
 			}
