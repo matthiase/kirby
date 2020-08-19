@@ -30,15 +30,18 @@
 
 <script>
 import { mapState, mapActions } from "vuex"
+import router from "@/router"
+
 export default {
   name: "Navbar",
   computed: {
     ...mapState("authentication", ["authenticated", "user"])
   },
   methods: {
-    ...mapActions('authentication', ["logout"]),
-    async handleSignOut() {
-      await this.logout()
+    ...mapActions("authentication", ["logout"]),
+    handleSignOut() {
+      this.logout()
+      router.push("/")
     }
   }
 }

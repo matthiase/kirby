@@ -52,6 +52,7 @@
 
 <script>
 import { mapState, mapActions } from "vuex"
+import router from "@/router"
 
 export default {
   name: "RegistrationView",
@@ -70,7 +71,10 @@ export default {
   methods: {
     ...mapActions("authentication", ["register"]),
     async handleSubmit() {
-      await this.register(this.user)
+      const currentUser = await this.register(this.user)
+      if (currentUser) {
+        router.push("/profile")
+      }
     }
   }
 }

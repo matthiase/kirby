@@ -58,6 +58,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+import router from "@/router"
 
 export default {
   name: "LoginView",
@@ -72,7 +73,10 @@ export default {
   methods: {
     ...mapActions("authentication", ["login"]),
     async handleLogin() {
-      this.login(this.user)
+      const currentUser = await this.login(this.user)
+      if (currentUser) {
+        router.push("/profile")
+      }
     }
   }
 }
