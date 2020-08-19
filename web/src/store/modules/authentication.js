@@ -1,4 +1,5 @@
 import UserService from "@/service/userService"
+import _ from "lodash"
 
 const currentUser = JSON.parse(localStorage.getItem("currentUser"))
 
@@ -7,16 +8,16 @@ const Authentication = {
   state: {
     loading: false,
     authenticated: currentUser != null,
-    user: currentUser
+    currentUser
   },
 
   actions: {
     async register({ dispatch, commit }, { name, email, password }) {
-      commit("setLoading")
+      commit("setLoading", true)
       try {
         const currentUser = await UserService.register(name, email, password)
         localStorage.setItem("currentUser", JSON.stringify(currentUser))
-        commit("setSuccess", currentUser)
+        commit("setCurrentUser", currentUser)
         return currentUser
       } catch (error) {
         dispatch("alert/error", error, { root: true })
@@ -24,11 +25,11 @@ const Authentication = {
     },
 
     async login({ dispatch, commit }, { email, password }) {
-      commit("setLoading")
+      commit("setLoading", true)
       try {
         const currentUser = await UserService.login(email, password)
         localStorage.setItem("currentUser", JSON.stringify(currentUser))
-        commit("setSuccess", currentUser)
+        commit("setCurrentUser", currentUser)
         return currentUser
       } catch (error) {
         dispatch("alert/error", error, { root: true })
@@ -36,25 +37,20 @@ const Authentication = {
     },
 
     logout({ commit }) {
-      commit("setLoading")
+      commit("setLoading", true)
       localStorage.removeItem("currentUser")
-      commit("setLogout")
+      commit("setCurrentUser", null)
     }
   },
 
   mutations: {
-    setLoading(state) {
-      state.loading = true
+    setLoading(state, isLoading) {
+      state.loading = isLoading
     },
-    setSuccess(state, user) {
-      state.authenticated = true
-      state.user = user
+    setCurrentUser(state, user) {
       state.loading = false
-    },
-    setLogout(state) {
-      state.authenticated = false
-      state.user = null
-      state.loading = false
+      state.authenticated = !_.isEmpty(user)
+      state.currentUser = user
     }
   }
 }
