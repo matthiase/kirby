@@ -58,6 +58,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+
 export default {
   name: "LoginView",
   data() {
@@ -71,7 +72,7 @@ export default {
   methods: {
     ...mapActions("authentication", ["login"]),
     async handleLogin() {
-      await this.login(this.user)
+      this.login(this.user)
     }
   }
 }
