@@ -1,16 +1,17 @@
 import Vue from "vue"
 import router from '@/router'
 import _ from "lodash"
+import decodeJwt from 'jwt-decode'
 
-const user = JSON.parse(localStorage.getItem("currentUser"))
+const currentUser = JSON.parse(localStorage.getItem("currentUser"))
 
 const Authentication = {
   namespaced: true,
   state: {
     loading: false,
     error: null,
-    authenticated: user != null,
-    user
+    authenticated: currentUser != null,
+    user: currentUser
   },
 
   actions: {
@@ -19,9 +20,10 @@ const Authentication = {
       try {
         const response = await Vue.axios.post("/users", { name, email, password })
         const { accessToken, refreshToken } = response.data.data
-        localStorage.setItem('accessToken', accessToken)
-        localStorage.setItem('refreshToken', refreshToken)
-        commit('setSuccess', { accessToken, refreshToken })
+        const claims = (({id, name, email}) => ({id, name, email}))(decodeJwt(accessToken))
+        const currentUser = {...claims, accessToken, refreshToken}
+        localStorage.setItem('currentUser', JSON.stringify(currentUser))
+        commit('setSuccess', currentUser)
         router.push('/')
       } catch (error) {
         const { errors } = error.response.data
