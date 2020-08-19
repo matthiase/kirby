@@ -42,7 +42,7 @@
                     <b-checkbox size="is-small">Remember this device</b-checkbox>
                   </div>
                   <div class="mt-3 mb-5">
-                    <b-button type="is-info" native-type="submit" expanded>
+                    <b-button type="is-info" native-type="submit" expanded :loading="loading">
                       Sign in
                     </b-button>
                   </div>
@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from "vuex"
 import router from "@/router"
 
 export default {
@@ -69,6 +69,9 @@ export default {
         password: ""
       }
     }
+  },
+  computed: {
+    ...mapState("authentication", ["loading"])
   },
   methods: {
     ...mapActions("authentication", ["login"]),

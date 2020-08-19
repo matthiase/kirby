@@ -36,7 +36,7 @@
                     By clicking the "Register" I agree to the terms of service
                   </div>
                   <div class="mt-3 mb-5">
-                    <b-button type="is-info" native-type="submit" expanded>
+                    <b-button type="is-info" native-type="submit" expanded :loading="loading">
                       Register
                     </b-button>
                   </div>
@@ -66,7 +66,7 @@ export default {
     }
   },
   computed: {
-    ...mapState("authentication", ["authenticated"])
+    ...mapState("authentication", ["authenticated", "loading"])
   },
   methods: {
     ...mapActions("authentication", ["register"]),
