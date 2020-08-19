@@ -1,27 +1,19 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import ApplicationLayout from '@/views/layout/Application'
-import PublicLayout from '@/views/layout/Public'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    component: PublicLayout,
+    component: ApplicationLayout,
     children: [
       {
         path: '',
         name: 'About',
         component: () => import(/* webpackChunkName: "about" */ '@/views/About')
-      }
-    ]
-  },
-  {
-    path: '/',
-    name: 'Application',
-    component: ApplicationLayout,
-    children: [
+      },
       {
         path: 'profile',
         name: 'Profile',

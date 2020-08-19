@@ -22,7 +22,7 @@
                     </router-link>
                   </p>
                 </div>
-                <form @submit.prevent='handleSubmit' class="pt-5">
+                <form @submit.prevent="handleSubmit" class="pt-5">
                   <b-field label="Full name">
                     <b-input type="text" v-model="user.name" />
                   </b-field>
@@ -106,24 +106,24 @@
 </template>
 
 <script>
-import { mapState, mapActions} from 'vuex'
+import { mapState, mapActions } from "vuex"
 
 export default {
-  name: 'RegistrationView',
+  name: "RegistrationView",
   data() {
     return {
       user: {
-        name: '',
-        email: '',
-        password: ''
+        name: "",
+        email: "",
+        password: ""
       }
     }
   },
   computed: {
-    ...mapState('authentication', ['Authentication'])
+    ...mapState("authentication", ["authenticated"])
   },
   methods: {
-    ...mapActions('authentication', ['register']),
+    ...mapActions("authentication", ["register"]),
     async handleSubmit() {
       await this.register(this.user)
     }
