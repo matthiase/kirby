@@ -6,7 +6,7 @@ import { handleErrorResponse } from './serviceHelpers'
 const UserService = {
   register: async (name, email, password) => {
     try {
-      const response = await Vue.axios.post("/users", { name, email, password })
+      const response = await Vue.http.post("/users", { name, email, password })
       return handleSuccessResponse(response)
     } catch (error) {
       handleErrorResponse(error)
@@ -15,7 +15,7 @@ const UserService = {
 
   login: async (email, password) => {
     try {
-      const response = await Vue.axios.post("/tokens", { email, password })
+      const response = await Vue.http.post("/tokens", { email, password })
       return handleSuccessResponse(response)
     } catch (error) {
       handleErrorResponse(error)

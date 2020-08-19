@@ -42,15 +42,15 @@ _axios.interceptors.response.use(
 )
 
 Plugin.install = function(Vue) {
-  Vue.axios = _axios
-  window.axios = _axios
+  Vue.http = _axios
+  window.http = _axios
   Object.defineProperties(Vue.prototype, {
-    axios: {
+    http: {
       get() {
         return _axios
       }
     },
-    $axios: {
+    $http: {
       get() {
         return _axios
       }
