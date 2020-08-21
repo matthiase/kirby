@@ -22,7 +22,6 @@
                     </router-link>
                   </p>
                 </div>
-
                 <form @submit.prevent="handleLogin" class="pt-5">
                   <b-field label="Email address">
                     <b-input type="email" v-model="user.email" />

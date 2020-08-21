@@ -20,6 +20,7 @@ const Authentication = {
         commit("setCurrentUser", currentUser)
         return currentUser
       } catch (error) {
+        commit("setCurrentUser", null)
         dispatch("alert/error", error, { root: true })
       }
     },
@@ -32,6 +33,7 @@ const Authentication = {
         commit("setCurrentUser", currentUser)
         return currentUser
       } catch (error) {
+        commit("setCurrentUser", null)
         dispatch("alert/error", error, { root: true })
       }
     },
