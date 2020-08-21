@@ -42,7 +42,7 @@
                     <b-checkbox size="is-small">Remember this device</b-checkbox>
                   </div>
                   <div class="mt-3 mb-5">
-                    <b-button type="is-info" native-type="submit" expanded :loading="loading">
+                    <b-button type="is-primary" native-type="submit" expanded :loading="loading">
                       Sign in
                     </b-button>
                   </div>

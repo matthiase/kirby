@@ -5,6 +5,10 @@
 $indigo-700: rgb(81, 69, 205);
 $indigo-600: rgb(88, 80, 236);
 $indigo-500: rgb(104, 117, 245);
+$purple-500: rgb(144, 97, 249);
+$blue-600: rgb(28, 100, 242);
+$blue-500: rgb(63, 131, 248);
+$blue-400: rgb(118, 169, 250);
 $teal-500: rgb(6, 148, 162);
 $orange-600: rgb(208, 56, 1);
 $red-700: rgb(200, 30, 30);
@@ -13,8 +17,8 @@ $green-700: rgb(4, 108, 78);
 $green-100: rgb(222, 247, 236);
 
 $primary: $indigo-500;
-$info: $teal-500;
-$link: $indigo-700;
+$info: $purple-500;
+$link: $blue-500;
 $success: $green-700;
 $danger: $red-700;
 /*
@@ -34,7 +38,7 @@ $custom-colors: (
 $family-sans-serif: 'Inter', sans-serif;
 
 $label-weight: 400;
-$link-hover: $indigo-500;
+$link-hover: $blue-600;
 $notification-radius: 1px;
 
 @import '~bulma/sass/utilities/derived-variables';

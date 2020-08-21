@@ -36,7 +36,7 @@
                     By clicking the "Register" I agree to the terms of service
                   </div>
                   <div class="mt-3 mb-5">
-                    <b-button type="is-info" native-type="submit" expanded :loading="loading">
+                    <b-button type="is-primary" native-type="submit" expanded :loading="loading">
                       Register
                     </b-button>
                   </div>
