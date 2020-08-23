@@ -52,11 +52,11 @@ func CreateUser(userService ServiceInterface) func(http.ResponseWriter, *http.Re
 			return
 		}
 
-		CreateUserResponse := CreateUserResponse{
+		createUserResponse := CreateUserResponse{
 			AccessToken:  tokenPair.AccessToken,
 			RefreshToken: tokenPair.RefreshToken,
 		}
-		httputil.RespondWithJSON(w, http.StatusCreated, CreateUserResponse)
+		httputil.RespondWithJSON(w, http.StatusCreated, createUserResponse)
 	}
 	return handler
 }

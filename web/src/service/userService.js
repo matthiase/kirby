@@ -1,12 +1,21 @@
 import Vue from "vue"
 import decodeJwt from "jwt-decode"
 
-import { handleErrorResponse } from './serviceHelpers'
+import { handleErrorResponse } from "./serviceHelpers"
 
 const UserService = {
   register: async (name, email, password) => {
     try {
       const response = await Vue.http.post("/users", { name, email, password })
+      return handleSuccessResponse(response)
+    } catch (error) {
+      handleErrorResponse(error)
+    }
+  },
+
+  update: async (name, email) => {
+    try {
+      const response = await Vue.http.put("/users", { name, email })
       return handleSuccessResponse(response)
     } catch (error) {
       handleErrorResponse(error)

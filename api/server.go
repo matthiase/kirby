@@ -68,6 +68,7 @@ func NewServer() *Server {
 	router.Route("/users", func(r chi.Router) {
 		r.Get("/{id}", user.FetchUser(userService))
 		r.Post("/", user.CreateUser(userService))
+		r.Put("/", user.UpdateUser(userService))
 	})
 
 	router.Route("/tokens", func(r chi.Router) {

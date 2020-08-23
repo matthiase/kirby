@@ -18,9 +18,9 @@ const _axios = axios.create(config)
 
 _axios.interceptors.request.use(
   config => {
-    const accessToken = localStorage.getItem('jwt')
-    if (accessToken) {
-      config.headers = { Authorization: `Bearer ${accessToken}` }
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'))
+    if (currentUser && currentUser.accessToken) {
+      config.headers = { Authorization: `Bearer ${currentUser.accessToken}` }
     }
     return config
   },

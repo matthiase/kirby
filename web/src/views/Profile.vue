@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section v-if="currentUser">
     <b-tabs position="is-centered" class="block">
       <b-tab-item label="Dashboards"></b-tab-item>
       <b-tab-item label="Collections"></b-tab-item>
@@ -25,7 +25,7 @@
               </b-field>
               <div class="columns mt-4">
                 <div class="column">
-                  <b-button type="is-primary" expanded>
+                  <b-button type="is-primary" native-type="submit" expanded>
                     Save
                   </b-button>
                 </div>
@@ -67,7 +67,8 @@
 </style>
 
 <script>
-import { mapState } from "vuex"
+import { mapActions, mapState } from "vuex"
+
 export default {
   name: "ProfileView",
   data() {
@@ -83,12 +84,17 @@ export default {
     ...mapState("authentication", ["currentUser"])
   },
   methods: {
+    ...mapActions("authentication", ["updateProfile"]),
     handleEditProfileClick() {
       this.user.name = this.currentUser.name
       this.user.email = this.currentUser.email
       this.isEditing = true
     },
     handleCancelProfileClick() {
+      this.isEditing = false
+    },
+    async handleSaveProfileClick() {
+      await this.updateProfile(this.user)
       this.isEditing = false
     }
   }

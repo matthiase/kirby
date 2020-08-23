@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"kirby/config"
 	"kirby/jwtutil"
 	"time"
@@ -16,6 +17,21 @@ type User struct {
 	Email          string `gorm:"unique_index;not null"`
 	HashedPassword string `gorm:"not null"`
 	Name           string `gorm:"not null"`
+}
+
+type contextKey string
+
+const userCtxKey contextKey = "currentUser"
+
+// NewContext returns a new context that carries the provided user value
+func NewContext(ctx context.Context, user User) context.Context {
+	return context.WithValue(ctx, userCtxKey, user)
+}
+
+// FromContext extracts a user from a context
+func FromContext(ctx context.Context) (User, bool) {
+	user, ok := ctx.Value(userCtxKey).(User)
+	return user, ok
 }
 
 // GenerateAccessToken creates a new JWT access token

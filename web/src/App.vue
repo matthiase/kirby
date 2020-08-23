@@ -7,7 +7,9 @@
         aria-close-label="Close notification"
         role="alert"
       >
-        {{ alert.message }}
+        <div class="has-text-centered">
+          {{ alert.message }}
+        </div>
       </b-notification>
     </div>
     <router-view />

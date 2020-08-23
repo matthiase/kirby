@@ -1,19 +1,15 @@
 package api
 
 import (
-	"context"
 	"errors"
+	"kirby/api/user"
 	"kirby/httputil"
 	"kirby/jwtutil"
 	"net/http"
 	"strings"
+
+	"github.com/jinzhu/gorm"
 )
-
-var userCtxKey *contextKey = &contextKey{"currentUser"}
-
-type contextKey struct {
-	name string
-}
 
 // JwtAuthentication authenticates requests using the token found in the Authentication header
 func JwtAuthentication(next http.Handler) http.Handler {
@@ -45,7 +41,14 @@ func JwtAuthentication(next http.Handler) http.Handler {
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), userCtxKey, claims)
+			currentUser := user.User{
+				Model: gorm.Model{ID: claims.ID},
+				Name:  claims.Name,
+				Email: claims.Email,
+			}
+
+			ctx := user.NewContext(r.Context(), currentUser)
+
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}
 	}

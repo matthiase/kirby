@@ -17,6 +17,7 @@ import (
 type ServiceInterface interface {
 	Find(uint) (*User, error)
 	Create(*CreateUserRequest) (*User, error)
+	Update(uint, *UpdateUserRequest) (*User, error)
 	Authenticate(AuthenticationRequest) (*TokenPair, error)
 	RefreshAccessToken(RefreshTokenRequest) (string, error)
 }
@@ -70,6 +71,22 @@ func (s *Service) Create(createUserRequest *CreateUserRequest) (*User, error) {
 				Message: "A user with that email address already exists",
 			}
 		}
+		return &User{}, err
+	}
+	return &user, nil
+}
+
+// Update an existing user record
+func (s *Service) Update(id uint, updateUserRequest *UpdateUserRequest) (*User, error) {
+	if err := updateUserRequest.Validate(); err != nil {
+		return &User{}, errors.ApplicationError{
+			Status:  http.StatusBadRequest,
+			Message: "User request validation failed",
+		}
+	}
+
+	user := User{Model: gorm.Model{ID: id}}
+	if err := s.DB.Model(&user).Updates(updateUserRequest).Error; err != nil {
 		return &User{}, err
 	}
 	return &user, nil

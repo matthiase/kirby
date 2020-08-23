@@ -25,6 +25,20 @@ const Authentication = {
       }
     },
 
+    async updateProfile({dispatch, commit}, {name, email}) {
+      commit("setLoading", true)
+      try {
+        const user = await UserService.update(name, email)
+        localStorage.setItem("currentUser", JSON.stringify(user))
+        commit("setCurrentUser", user)
+        dispatch("alert/success", "Successfully updated user profile.", { root: true })
+        return currentUser
+      } catch (error) {
+        commit("setCurrentUser", JSON.parse(localStorage.getItem('currentUser')))
+        dispatch("alert/error", error, { root: true })
+      }
+    },
+
     async login({ dispatch, commit }, { email, password }) {
       commit("setLoading", true)
       try {
