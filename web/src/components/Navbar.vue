@@ -9,7 +9,14 @@
       <b-navbar-item tag="div">
         <b-navbar-dropdown v-if="authenticated">
           <template slot="label">
-            <b-image src="https://avatars1.githubusercontent.com/u/210818?s=60&v=4" class="is-24x24" rounded />
+            <avatar
+              :username="currentUser.name"
+              :size="32"
+              class="avatar-image"
+              backgroundColor="rgb(6, 148, 162)"
+              color="#EFEFEF"
+              :customStyle="avatarStyle"
+            />
           </template>
           <b-navbar-item tag="router-link" to="/profile">
             Your profile
@@ -31,11 +38,23 @@
 <script>
 import { mapState, mapActions } from "vuex"
 import router from "@/router"
+import Avatar from "vue-avatar"
 
 export default {
   name: "Navbar",
+  components: {
+    Avatar
+  },
+  data() {
+    return {
+      avatarStyle: {
+        display: "inline-block",
+        fontFamily: "inherit"
+      }
+    }
+  },
   computed: {
-    ...mapState("authentication", ["authenticated", "user"])
+    ...mapState("authentication", ["authenticated", "currentUser"])
   },
   methods: {
     ...mapActions("authentication", ["logout"]),
