@@ -1,14 +1,23 @@
 <template>
   <section v-if="currentUser">
+
+    <b-modal v-model="isImageUploadActive" has-modal-card full-screen>
+      <template>
+        <image-upload @close="handleImageUploadCancel" title="Change avatar"  :imageUrl="avatarUrl" />
+      </template>
+    </b-modal>
+
     <div class="profile-card has-text-centered">
-      <avatar
-        :username="currentUser.name"
-        :size="150"
-        class="avatar-image"
-        backgroundColor="rgb(6, 148, 162)"
-        color="#EFEFEF"
-        :customStyle="avatarStyle"
-      />
+      <a href="javascript:void(0);" @click="handleAvatarClick">
+        <vue-avatar
+          :username="currentUser.name"
+          :size="150"
+          class="avatar-image"
+          backgroundColor="rgb(6, 148, 162)"
+          color="#EFEFEF"
+          :customStyle="avatarStyle"
+        />
+      </a>
       <div class="mt-5 px-3">
         <form v-if="isEditing" @submit.prevent="handleSaveProfileClick" class="px-2">
           <b-field>
@@ -69,16 +78,20 @@
 
 <script>
 import { mapActions, mapState } from "vuex"
-import Avatar from "vue-avatar"
+import VueAvatar from "vue-avatar"
+import ImageUpload from "@/components/ImageUpload"
 
 export default {
   name: "ProfileView",
   components: {
-    Avatar
+    VueAvatar,
+    ImageUpload
   },
   data() {
     return {
       isEditing: false,
+      isImageUploadActive: false,
+      avatarUrl: 'https://images.unsplash.com/photo-1519119012096-c145def61801?ixlib=rb-1.2.1&auto=format&fit=crop&w=1280&q=80',
       user: {
         name: "",
         email: ""
@@ -105,6 +118,12 @@ export default {
     async handleSaveProfileClick() {
       await this.updateProfile(this.user)
       this.isEditing = false
+    },
+    handleAvatarClick() {
+      this.isImageUploadActive = true
+    },
+    handleImageUploadCancel() {
+      this.isImageUploadActive = false
     }
   }
 }

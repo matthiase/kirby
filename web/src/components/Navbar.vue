@@ -9,7 +9,7 @@
       <b-navbar-item tag="div">
         <b-navbar-dropdown v-if="authenticated">
           <template slot="label">
-            <avatar
+            <vue-avatar
               :username="currentUser.name"
               :size="32"
               class="avatar-image"
@@ -38,12 +38,12 @@
 <script>
 import { mapState, mapActions } from "vuex"
 import router from "@/router"
-import Avatar from "vue-avatar"
+import VueAvatar from "vue-avatar"
 
 export default {
   name: "Navbar",
   components: {
-    Avatar
+    VueAvatar
   },
   data() {
     return {

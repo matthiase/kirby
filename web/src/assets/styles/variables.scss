@@ -15,7 +15,7 @@ $teal-500: rgb(6, 148, 162);
 $orange-600: rgb(208, 56, 1);
 
 $primary: $indigo-500;
-$info: $purple-500;
+$info: $teal-500;
 $link: $blue-500;
 
 $custom-colors: (
@@ -24,9 +24,6 @@ $custom-colors: (
     findColorInvert($orange-600)
   ),
 );
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-$family-sans-serif: 'Inter', sans-serif;
 
 $label-weight: 400;
 $link-hover: $blue-600;
